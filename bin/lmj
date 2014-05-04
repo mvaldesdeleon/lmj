@@ -1,2 +1,82 @@
 #!/usr/bin/env node
 
+// Libraries
+var program = require('commander');
+var lmj =     require('../lib/lmj.js');
+var helper =  require('../lib/helper.js');
+
+// Default parameters for the CLI options.
+var defaults = {
+  config: '~/lmj.conf'
+};
+
+// Program set-up
+program
+  // Version
+  .version(require('../package.json').version || '')
+  // Global options
+  .option('-c, --config <file>', 'use the specified configuration file. defaults to ~/lmj.conf', defaults.config);
+
+// List
+program
+  .command('list <projects|tasks>')
+  .description('lists your current LogMyTime Projects or Tasks')
+  .action(function(type, command) {
+    // Get the valid values from the command specification itself, Cajun-style.
+    if (command._args[0].name.split('|').indexOf(type) !== -1) {
+      if (command._options === undefined) command._options = [];
+      command._options.push('type');
+      command['type'] = type;
+    } else {
+      helper.invalidArgument(command._name, type);
+    }
+  });
+
+program
+  .command('log-time')
+  .description('manually creates a LogMyTime Entry');
+
+program
+  .command('sync')
+  .description('syncrhonizes the local repository of LogMyTime Projects and Tasks');
+
+program
+  .command('start [name]')
+  .description('starts a local LogMyTime stop-watch.')
+  .action(function(name, command) {
+    if (command._options === undefined) command._options = [];
+    command._options.push('name');
+    command['name'] = name;
+  });
+
+program
+  .command('stop [name]')
+  .description('stops a local LogMyTime stop-watch')
+  .action(function(name, command) {
+    if (command._options === undefined) command._options = [];
+    command._options.push('name');
+    command['name'] = name;
+  });
+
+// Process the actual input. 'action' calls get triggered immediately.
+program.parse(process.argv);
+
+// Get the goodies!
+var options = helper.getOptions(program),
+    command = helper.getCommand(program),
+    commandName = command._name,
+    commandOptions = helper.getOptions(command);
+
+// If no command was specified, abort with the help view.
+if (command === null) {
+  program.help();
+}
+
+console.log('Command: ' + commandName);
+console.log('Global Options:');
+console.dir(options);
+console.log('Command Options:');
+console.dir(commandOptions);
+
+lmj.lmt.fromTime();
+lmj.jira.fromJira();

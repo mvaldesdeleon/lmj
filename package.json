@@ -15,6 +15,7 @@
         "email": "m.valdesdeleon@gmail.com"
     },
     "dependencies": {
+        "commander": "~2.2.0"
     },
     "engines": {
         "node": ">=0.10"
