@@ -1,0 +1,37 @@
+{
+    "name": "lmj",
+    "version": "0.0.1",
+    "description": "Node based cli tool to automate LogMyTime and Jira",
+    "author": {
+      "name": "Martín Valdés de León",
+      "email": "m.valdesdeleon@gmail.com"
+    },
+    "preferGlobal": "true",
+    "bin": {
+        "lmj": "bin/lmj"
+    },
+    "bugs": {
+        "url": "https://github.com/mvaldesdeleon/lmj/issues",
+        "email": "m.valdesdeleon@gmail.com"
+    },
+    "dependencies": {
+    },
+    "engines": {
+        "node": ">=0.10"
+    },
+    "homepage": "https://github.com/mvaldesdeleon/lmj",
+    "keywords": [
+        "logmytime",
+        "jira",
+        "cli"
+    ],
+    "license": "LGPL-3.0",
+    "main": "lib/lmj",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/mvaldesdeleon/lmj.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
+}
