@@ -2,12 +2,25 @@
 
 // Libraries
 var program = require('commander');
-var lmj =     require('../lib/lmj.js');
-var helper =  require('../lib/helper.js');
+var helper  = require('../lib/helper.js');
+var config  = require('../lib/config.js');
+var router  = require('../lib/router.js');
+var util    = require('util');
 
 // Default parameters for the CLI options.
-var defaults = {
-  config: '~/lmj.conf'
+var defaultOptions = {
+  config: '~/lmj.conf',
+  cache: '~/.lmj'
+};
+
+var configFile = {
+  'lmt': {
+    'apiKey': ''
+  },
+  'jira': {
+    'userName': '',
+    'password': ''
+  }
 };
 
 // Program set-up
@@ -15,11 +28,13 @@ program
   // Version
   .version(require('../package.json').version || '')
   // Global options
-  .option('-c, --config <file>', 'use the specified configuration file. defaults to ~/lmj.conf', defaults.config);
+  .option('--config <file>', 'use the specified configuration file. defaults to ~/lmj.conf', defaultOptions.config)
+  .option('--cacheDir <directory>', 'use the specified cache directory. defaults to ~/.lmj', defaultOptions.cache)
+  .option('-v, --verbose', 'output more information', function(value, total) { return total++; }, 0);
 
 // List
 program
-  .command('list <projects|tasks>')
+  .command('list <projects|tasks|clocks>')
   .description('lists your current LogMyTime Projects or Tasks')
   .action(function(type, command) {
     // Get the valid values from the command specification itself, Cajun-style.
@@ -34,11 +49,13 @@ program
 
 program
   .command('log-time')
-  .description('manually creates a LogMyTime Entry');
+  .description('manually creates a LogMyTime Entry')
+  .action(function() {});
 
 program
   .command('sync')
-  .description('syncrhonizes the local repository of LogMyTime Projects and Tasks');
+  .description('syncrhonizes the local repository of LogMyTime Projects and Tasks')
+  .action(function() {});
 
 program
   .command('start [name]')
@@ -61,22 +78,32 @@ program
 // Process the actual input. 'action' calls get triggered immediately.
 program.parse(process.argv);
 
-// Get the goodies!
-var options = helper.getOptions(program),
-    command = helper.getCommand(program),
-    commandName = command._name,
-    commandOptions = helper.getOptions(command);
+var command = helper.getCommand(program);
 
 // If no command was specified, abort with the help view.
 if (command === null) {
   program.help();
 }
 
-console.log('Command: ' + commandName);
-console.log('Global Options:');
-console.dir(options);
-console.log('Command Options:');
-console.dir(commandOptions);
+// Get the goodies!
+var programOptions = helper.getOptions(program),
+    commandName = command._name,
+    commandOptions = helper.getOptions(command);
 
-lmj.lmt.fromTime();
-lmj.jira.fromJira();
+// Load the configuration file
+var result = config.load(programOptions.config);
+
+// If the file couldn't be loaded, load a configuration template and attempt to save it
+if (result instanceof Error) {
+  config.load(configFile);
+  config.save(programOptions.config, true);
+}
+
+// The final options object
+var options = {};
+
+util._extend(options, config.get()); // Add the options from the configuration file
+util._extend(options, programOptions); // Add the global options
+util._extend(options, commandOptions); // Add the command options
+
+router.route(commandName, options);
