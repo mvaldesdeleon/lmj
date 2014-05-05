@@ -36,6 +36,7 @@ program
 program
   .command('list <projects|tasks|clocks>')
   .description('lists your current LogMyTime Projects or Tasks')
+  .option('--sync', 'syncrhonizes the requested items before listing them', false)
   .action(function(type, command) {
     // Get the valid values from the command specification itself, Cajun-style.
     if (command._args[0].name.split('|').indexOf(type) !== -1) {
@@ -44,6 +45,7 @@ program
       command['type'] = type;
     } else {
       helper.invalidArgument(command._name, type);
+      process.exit(1);
     }
   });
 
@@ -82,7 +84,8 @@ var command = helper.getCommand(program);
 
 // If no command was specified, abort with the help view.
 if (command === null) {
-  program.help();
+  program.outputHelp();
+  process.exit();
 }
 
 // Get the goodies!
@@ -105,5 +108,11 @@ var options = {};
 util._extend(options, config.get()); // Add the options from the configuration file
 util._extend(options, programOptions); // Add the global options
 util._extend(options, commandOptions); // Add the command options
+
+// Create the cache folder (or check if it exists). If it fails, abort.
+if (helper.makePath(options.cacheDir) !== true) {
+  helper.genericError('could not create cache directory'); 
+  process.exit(1);
+}
 
 router.route(commandName, options);
