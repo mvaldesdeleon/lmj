@@ -34,7 +34,7 @@ program
 
 // List
 program
-  .command('list <projects|tasks|clocks>')
+  .command('list <projects|tasks|clients|clocks>')
   .description('lists your current LogMyTime Projects or Tasks')
   .option('--sync', 'syncrhonizes the requested items before listing them', false)
   .action(function(type, command) {
