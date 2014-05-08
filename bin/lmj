@@ -42,6 +42,8 @@ program
   .command('list <projects|tasks|clients|clocks>')
   .description('lists your current LogMyTime Projects or Tasks')
   .option('--sync', 'syncrhonizes the requested items before listing them', false)
+  .option('--group', '(projects) group by client', false)
+  .option('--used', '(clients) only show clients of currently asigned projects', false)
   .action(function(type, command) {
     // Get the valid values from the command specification itself, Cajun-style.
     if (command._args[0].name.split('|').indexOf(type) !== -1) {
