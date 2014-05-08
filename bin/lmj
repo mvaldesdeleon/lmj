@@ -7,6 +7,8 @@ var config  = require('../lib/config.js');
 var router  = require('../lib/router.js');
 var util    = require('util');
 
+var noop = function() {};
+
 // Default parameters for the CLI options.
 var defaultOptions = {
   config: '~/lmj.conf',
@@ -22,6 +24,9 @@ var configFile = {
     'password': ''
   }
 };
+
+// ###############################################################
+// ###############################################################
 
 // Program set-up
 program
@@ -52,12 +57,12 @@ program
 program
   .command('log-time')
   .description('manually creates a LogMyTime Entry')
-  .action(function() {});
+  .action(noop);
 
 program
   .command('sync')
   .description('syncrhonizes the local repository of LogMyTime Projects and Tasks')
-  .action(function() {});
+  .action(noop);
 
 program
   .command('start [name]')
@@ -80,6 +85,9 @@ program
 // Process the actual input. 'action' calls get triggered immediately.
 program.parse(process.argv);
 
+// ###############################################################
+// ###############################################################
+
 var command = helper.getCommand(program);
 
 // If no command was specified, abort with the help view.
@@ -87,6 +95,9 @@ if (command === null) {
   program.outputHelp();
   process.exit();
 }
+
+// ###############################################################
+// ###############################################################
 
 // Get the goodies!
 var programOptions = helper.getOptions(program),
@@ -108,6 +119,9 @@ var options = {};
 util._extend(options, config.get()); // Add the options from the configuration file
 util._extend(options, programOptions); // Add the global options
 util._extend(options, commandOptions); // Add the command options
+
+// ###############################################################
+// ###############################################################
 
 // Create the cache folder (or check if it exists). If it fails, abort.
 if (helper.makePath(options.cacheDir) !== true) {
