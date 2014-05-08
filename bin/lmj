@@ -58,6 +58,10 @@ program
 
 program
   .command('log-time')
+  .option('--project <id>', 'the selected project\'s <id>', function(id) { return parseInt(id, 10); }, 0)
+  .option('--task <id>', 'the selected task\'s <id>', function(id) { return parseInt(id, 10); }, 0)
+  .option('--date <date>', 'the <date> as something Date() understands. defaults to today', function(date) { return new Date(date); }, new Date())
+  .option('--time <time>', 'the <time> duration as number (eg. 2.5) or string (eg. 2:30)', '')
   .description('manually creates a LogMyTime Entry')
   .action(noop);
 
